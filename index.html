@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activity & To-Do Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1e1e1e;
+      --panel-bg: #2a2a2a;
+      --border: #3a3a3a;
+      --text: #e1e1e1;
+      --text-muted: #aaaaaa;
+      --accent: #757575;
+      --radius: 6px;
+      --shadow: rgba(0, 0, 0, 0.5) 0px 1px 3px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    #auth-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    #auth-container button {
+      background: var(--accent);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    #auth-container button:hover {
+      background: #606060;
+    }
+    #user-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    #user-profile img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+    }
+    #user-profile span {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    #user-profile button {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .container {
+      display: flex;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .card {
+      width: 32%;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .card h2 {
+      font-size: 1.125rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+    }
+    .input-group {
+      display: flex;
+      margin-bottom: 1rem;
+    }
+    .input-group input,
+    .input-group textarea {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-right: none;
+      border-radius: var(--radius) 0 0 var(--radius);
+      font-size: 0.95rem;
+      outline: none;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .input-group input:focus,
+    .input-group textarea:focus {
+      border-color: var(--accent);
+    }
+    .input-group button {
+      border: 1px solid var(--border);
+      background: var(--accent);
+      color: var(--text);
+      padding: 0 1rem;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .input-group button:hover {
+      background: #606060;
+    }
+    /* Bullet style list */
+    ul {
+      flex: 1;
+      overflow-y: auto;
+      margin: 0;
+      padding-left: 1rem;
+      list-style-type: disc;
+      list-style-position: inside;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    /* Style list items with flex layout */
+    ul li {
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+    }
+    ul li:last-child {
+      border-bottom: none;
+    }
+    ul li button {
+        float: right;
+        background: transparent;
+        border: none;
+        color: var(--accent);
+        cursor: pointer;
+        font-weight: 600;
+        transition: color 0.2s;
+        margin-left: 0.5rem;
+    }
+        ul li button:hover {
+        color: #909090;
+        }
+        ul li:last-child {
+        border-bottom: none;
+        }
+
+
+        #calendar-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1.2rem;
+}
+#calendar-controls button {
+  background: var(--accent);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.2rem 0.85rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#calendar-controls button:hover { background: #606060; }
+#calendar-title {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+#calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+#calendar-table th,
+#calendar-table td {
+  text-align: center;
+  padding: 0.55rem 0.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.98rem;
+  cursor: pointer;
+  position: relative;
+}
+#calendar-table th {
+  background: #222;
+  color: var(--text-muted);
+  font-size: 0.93rem;
+}
+#calendar-table td.today {
+  background: var(--accent);
+  color: #fff;
+  font-weight: bold;
+  border: 1.5px solid var(--accent);
+}
+#calendar-table td.memo {
+  background: #2d3140;
+  color: #f9d87b;
+  font-weight: 600;
+}
+#calendar-table td:hover:not(.empty) {
+  background: #404040;
+}
+#calendar-table td.empty {
+  background: none;
+  cursor: default;
+  border: none;
+}
+#calendar-memo-box {
+  background: #23242b;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 0.9rem 1rem 0.8rem 1rem;
+  margin-top: 0.8rem;
+}
+.calendar-wrapper {
+  max-width: 1200px;
+  margin: 0 auto 3rem auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: center;
+}
+#calendar-card {
+  width: 100%;
+  max-width: 700px;
+}
+
+
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+    gap: 1.2rem;
+    max-width: 95vw;
+  }
+  .card {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .calendar-wrapper {
+    max-width: 100vw;
+    padding: 0 0.5rem;
+  }
+  #calendar-card {
+    max-width: 100%;
+    min-width: 0;
+    padding: 1rem 0.5rem;
+  }
+  #calendar-table th,
+  #calendar-table td {
+    padding: 0.4rem 0.02rem;
+    font-size: 0.92rem;
+  }
+  #calendar-memo-box {
+    padding: 0.7rem 0.4rem 0.7rem 0.4rem;
+  }
+}
+
+@media (max-width: 500px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 0.7rem;
+    gap: 0.8rem;
+  }
+  .container, .calendar-wrapper {
+    padding: 0 0.1rem;
+  }
+  #calendar-card {
+    padding: 0.8rem 0.2rem;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Activity &amp; To-Do</h1>
+    <div id="auth-container">
+      <button id="google-login">Sign in with Google</button>
+      <div id="user-profile" style="display:none">
+        <img id="user-photo" src="" alt="Profile" />
+        <span id="user-name"></span>
+        <button id="logout">Logout</button>
+      </div>
+    </div>
+  </header>
+  <div class="container" id="app-container">
+    <div class="card" id="todo-card">
+      <h2>To-Do List</h2>
+      <div class="input-group">
+        <input type="text" id="todo-input" placeholder="Add a task..." />
+        <button id="add-todo">Add</button>
+      </div>
+      <ul id="todo-list"></ul>
+    </div>
+    <div class="card" id="activity-card">
+      <h2>Development Log</h2>
+        <div class="input-group">
+        <input type="text" id="activity-input" placeholder="Log your activity..." />
+        <button id="add-activity">Log</button>
+        </div>
+      <ul id="activity-list"></ul>
+    </div>
+    <div class="card" id="cert-card">
+      <h2>Certifications</h2>
+      <div class="input-group">
+        <input type="text" id="cert-input" placeholder="Certificate name..." />
+        <button id="add-cert">Add</button>
+      </div>
+      <ul id="cert-list"></ul>
+    </div>
+</div>
+
+
+<div class="calendar-wrapper">
+  <div class="card" id="calendar-card">
+  <h2>Calendar</h2>
+  <div id="calendar-controls">
+    <button id="prev-month">&lt;</button>
+    <span id="calendar-title"></span>
+    <button id="next-month">&gt;</button>
+  </div>
+  <table id="calendar-table"></table>
+  <div id="calendar-memo-box" style="display:none;">
+    <div style="margin-bottom: 0.5rem;">
+      <span id="memo-date"></span>
+    </div>
+    <div class="input-group" style="margin-bottom:0;">
+      <input type="text" id="memo-input" placeholder="Add memo for this day..." />
+      <button id="save-memo">Save</button>
+      <button id="delete-memo" style="margin-left: 0.5rem; background:#444;">Delete</button>
+    </div>
+    <div id="saved-memo" style="color:var(--text-muted); margin-top:0.6rem; font-size:0.95rem;"></div>
+  </div>
+  </div>
+
+  </div>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js';
+    import { getFirestore, collection, addDoc, deleteDoc, onSnapshot, doc as docRef } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyDFr3NcjdP_jCWp-ldiqYO0xZjpjqw5tls',
+      authDomain: 'myhistory-924fb.firebaseapp.com',
+      projectId: 'myhistory-924fb',
+      storageBucket: 'myhistory-924fb.firebasestorage.app',
+      messagingSenderId: '1010187867994',
+      appId: '1:1010187867994:web:3a30da15d38c7885380563',
+      measurementId: 'G-ZRNBV090SG'
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const googleLoginBtn = document.getElementById('google-login');
+    const logoutBtn = document.getElementById('logout');
+    const userProfile = document.getElementById('user-profile');
+    const userName = document.getElementById('user-name');
+    const userPhoto = document.getElementById('user-photo');
+    const appContainer = document.getElementById('app-container');
+
+    const todoInput = document.getElementById('todo-input');
+    const addTodoBtn = document.getElementById('add-todo');
+    const todoList = document.getElementById('todo-list');
+    const activityInput = document.getElementById('activity-input');
+    const addActivityBtn = document.getElementById('add-activity');
+    const activityList = document.getElementById('activity-list');
+    const certInput = document.getElementById('cert-input');
+    const addCertBtn = document.getElementById('add-cert');
+    const certList = document.getElementById('cert-list');
+
+    const provider = new GoogleAuthProvider();
+    const todosCol = collection(db, 'todos');
+    const activitiesCol = collection(db, 'activities');
+    const certsCol = collection(db, 'certifications');
+
+    googleLoginBtn.onclick = async () => { try { await signInWithPopup(auth, provider); } catch (e) { alert(e.message);} };
+    logoutBtn.onclick = async () => { await signOut(auth); };
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        googleLoginBtn.style.display = 'none';
+        userProfile.style.display = 'flex';
+        userName.textContent = user.displayName || user.email;
+        userPhoto.src = user.photoURL || '';
+        appContainer.style.display = 'flex';
+      } else {
+        googleLoginBtn.style.display = 'block';
+        userProfile.style.display = 'none';
+        appContainer.style.display = 'none';
+      }
+    });
+
+    onSnapshot(todosCol, snap => { todoList.innerHTML = ''; snap.forEach(d => addItem(d.id, d.data().text, todoList, 'todos')); });
+    onSnapshot(activitiesCol, snap => { activityList.innerHTML = ''; snap.forEach(d => addItem(d.id, d.data().text, activityList, 'activities')); });
+    onSnapshot(certsCol, snap => { certList.innerHTML = ''; snap.forEach(d => addItem(d.id, d.data().text, certList, 'certifications')); });
+
+    function addItem(id, text, listEl, col) {
+      const li = document.createElement('li'); li.dataset.id = id;
+      const span = document.createElement('span'); span.textContent = text;
+      const btn = document.createElement('button'); btn.textContent = 'Delete';
+      btn.onclick = async () => { await deleteDoc(docRef(db, col, id)); };
+      li.append(span, btn);
+      listEl.appendChild(li);
+    }
+
+    addTodoBtn.onclick = async () => { const t = todoInput.value.trim(); if (t) { await addDoc(todosCol, { text: t }); todoInput.value = ''; } };
+    addActivityBtn.onclick = async () => {
+  const t = activityInput.value.trim();
+  if (t) {
+    await addDoc(activitiesCol, { text: t });
+    activityInput.value = '';
+  }
+};
+    addCertBtn.onclick = async () => { const t = certInput.value.trim(); if (t) { await addDoc(certsCol, { text: t }); certInput.value = ''; } };
+  
+
+
+    //달력
+    // --- Calendar & Memo Logic ---
+const calendarCard = document.getElementById('calendar-card');
+const calendarTable = document.getElementById('calendar-table');
+const calendarTitle = document.getElementById('calendar-title');
+const prevMonthBtn = document.getElementById('prev-month');
+const nextMonthBtn = document.getElementById('next-month');
+const calendarMemoBox = document.getElementById('calendar-memo-box');
+const memoDateSpan = document.getElementById('memo-date');
+const memoInput = document.getElementById('memo-input');
+const saveMemoBtn = document.getElementById('save-memo');
+const deleteMemoBtn = document.getElementById('delete-memo');
+const savedMemoDiv = document.getElementById('saved-memo');
+
+const calendarCol = collection(db, 'calendarMemos');
+let currentYear, currentMonth; // month: 0~11
+let calendarMemoMap = {}; // { '2024-07-07': {text, id} }
+
+function getDateStr(year, month, day) {
+  return `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+function renderCalendar(year, month) {
+  currentYear = year; currentMonth = month;
+  calendarTitle.textContent = `${year}년 ${month+1}월`;
+  const firstDay = new Date(year, month, 1).getDay(); // 일~토: 0~6
+  const lastDate = new Date(year, month+1, 0).getDate();
+
+  let html = '<thead><tr>';
+  ['일','월','화','수','목','금','토'].forEach(d=>html+=`<th>${d}</th>`);
+  html += '</tr></thead><tbody><tr>';
+
+  let day = 1, col = 0;
+  // fill blanks
+  for(let i=0;i<firstDay;i++){ html+='<td class="empty"></td>'; col++; }
+  while(day <= lastDate){
+    const dateStr = getDateStr(year, month, day);
+    let tdClass = [];
+    if(new Date().getFullYear()===year && new Date().getMonth()===month && new Date().getDate()===day) tdClass.push('today');
+    if(calendarMemoMap[dateStr]) tdClass.push('memo');
+    html += `<td class="${tdClass.join(' ')}" data-date="${dateStr}">${day}</td>`;
+    day++; col++;
+    if(col===7 && day<=lastDate){ html+='</tr><tr>'; col=0; }
+  }
+  for(;col<7;col++){ html+='<td class="empty"></td>'; }
+  html += '</tr></tbody>';
+  calendarTable.innerHTML = html;
+}
+function showMemoBox(dateStr){
+  calendarMemoBox.style.display = 'block';
+  memoDateSpan.textContent = dateStr;
+  memoInput.value = calendarMemoMap[dateStr]?.text || '';
+  savedMemoDiv.textContent = calendarMemoMap[dateStr]?.text || '';
+  saveMemoBtn.textContent = calendarMemoMap[dateStr] ? "Update" : "Save";
+  deleteMemoBtn.style.display = calendarMemoMap[dateStr] ? "inline-block" : "none";
+  calendarMemoBox.setAttribute('data-date', dateStr);
+}
+calendarTable.onclick = (e) => {
+  if(e.target.dataset.date){
+    showMemoBox(e.target.dataset.date);
+  }
+};
+saveMemoBtn.onclick = async ()=>{
+  const dateStr = calendarMemoBox.getAttribute('data-date');
+  const text = memoInput.value.trim();
+  if(!dateStr) return;
+  if(text){
+    if(calendarMemoMap[dateStr]){
+      // update
+      await addDoc(calendarCol, { date: dateStr, text }); // 덮어쓰기
+      // 또는 updateDoc(docRef(db,'calendarMemos', calendarMemoMap[dateStr].id), {text});
+    }else{
+      await addDoc(calendarCol, { date: dateStr, text });
+    }
+  }
+  memoInput.value = '';
+};
+deleteMemoBtn.onclick = async ()=>{
+  const dateStr = calendarMemoBox.getAttribute('data-date');
+  if(calendarMemoMap[dateStr]){
+    await deleteDoc(docRef(db, 'calendarMemos', calendarMemoMap[dateStr].id));
+    memoInput.value = '';
+  }
+};
+prevMonthBtn.onclick = ()=> renderCalendar(currentYear, currentMonth-1<0?11:currentMonth-1, currentMonth-1<0?currentYear-1:currentYear);
+nextMonthBtn.onclick = ()=> renderCalendar(currentYear, currentMonth+1>11?0:currentMonth+1, currentMonth+1>11?currentYear+1:currentYear);
+
+onSnapshot(calendarCol, snap => {
+  calendarMemoMap = {};
+  snap.forEach(d => {
+    if(d.data().date) calendarMemoMap[d.data().date]={text:d.data().text,id:d.id};
+  });
+  renderCalendar(currentYear??new Date().getFullYear(), currentMonth??new Date().getMonth());
+  // memo 갱신 필요시
+  if(calendarMemoBox.style.display==='block'){
+    const dateStr = calendarMemoBox.getAttribute('data-date');
+    memoInput.value = calendarMemoMap[dateStr]?.text||'';
+    savedMemoDiv.textContent = calendarMemoMap[dateStr]?.text||'';
+    saveMemoBtn.textContent = calendarMemoMap[dateStr] ? "Update" : "Save";
+    deleteMemoBtn.style.display = calendarMemoMap[dateStr] ? "inline-block" : "none";
+  }
+});
+// 초기 렌더
+renderCalendar(new Date().getFullYear(), new Date().getMonth());
+
+  </script>
+</body>
+</html>
