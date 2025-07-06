@@ -408,18 +408,38 @@
     logoutBtn.onclick = async () => { await signOut(auth); };
 
     onAuthStateChanged(auth, user => {
-      if (user) {
+    if (user) {
         googleLoginBtn.style.display = 'none';
         userProfile.style.display = 'flex';
         userName.textContent = user.displayName || user.email;
         userPhoto.src = user.photoURL || '';
         appContainer.style.display = 'flex';
-      } else {
+
+        // ✅ 로그인한 상태에서만 데이터 가져오기
+        onSnapshot(todosCol, snap => { 
+        todoList.innerHTML = ''; 
+        snap.forEach(d => addItem(d.id, d.data().text, todoList, 'todos')); 
+        });
+        onSnapshot(activitiesCol, snap => { 
+        activityList.innerHTML = ''; 
+        snap.forEach(d => addItem(d.id, d.data().text, activityList, 'activities')); 
+        });
+        onSnapshot(certsCol, snap => { 
+        certList.innerHTML = ''; 
+        snap.forEach(d => addItem(d.id, d.data().text, certList, 'certifications')); 
+        });
+    } else {
         googleLoginBtn.style.display = 'block';
         userProfile.style.display = 'none';
         appContainer.style.display = 'none';
-      }
+
+        // ✅ 데이터 초기화 (로그아웃시 UI 초기화)
+        todoList.innerHTML = '';
+        activityList.innerHTML = '';
+        certList.innerHTML = '';
+    }
     });
+
 
     onSnapshot(todosCol, snap => { todoList.innerHTML = ''; snap.forEach(d => addItem(d.id, d.data().text, todoList, 'todos')); });
     onSnapshot(activitiesCol, snap => { activityList.innerHTML = ''; snap.forEach(d => addItem(d.id, d.data().text, activityList, 'activities')); });
