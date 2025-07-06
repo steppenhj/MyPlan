@@ -340,7 +340,7 @@
 </div>
 
 
-<div class="calendar-wrapper">
+<div class="calendar-wrapper" id="calendar-wrapper">
   <div class="card" id="calendar-card">
   <h2>Calendar</h2>
   <div id="calendar-controls">
@@ -414,6 +414,7 @@ onAuthStateChanged(auth, user => {
     userName.textContent = user.displayName || user.email;
     userPhoto.src = user.photoURL || '';
     appContainer.style.display = 'flex';
+    calendarWrapper.style.display = 'flex'; // 달력 보이기
 
     // ✅ 로그인한 상태에서만 데이터 가져오기
     onSnapshot(todosCol, snap => { 
@@ -428,19 +429,45 @@ onAuthStateChanged(auth, user => {
       certList.innerHTML = ''; 
       snap.forEach(d => addItem(d.id, d.data().text, certList, 'certifications')); 
     });
+
+    // ✅ 달력 데이터도 로그인 상태에서만 가져오기
+    unsubscribeCalendar = onSnapshot(calendarCol, snap => {
+      calendarMemoMap = {};
+      snap.forEach(d => {
+        if(d.data().date) calendarMemoMap[d.data().date]={text:d.data().text,id:d.id};
+      });
+      renderCalendar(currentYear ?? new Date().getFullYear(), currentMonth ?? new Date().getMonth());
+      // memo 갱신 필요시
+      if(calendarMemoBox.style.display==='block'){
+        const dateStr = calendarMemoBox.getAttribute('data-date');
+        memoInput.value = calendarMemoMap[dateStr]?.text||'';
+        savedMemoDiv.textContent = calendarMemoMap[dateStr]?.text||'';
+        saveMemoBtn.textContent = calendarMemoMap[dateStr] ? "Update" : "Save";
+        deleteMemoBtn.style.display = calendarMemoMap[dateStr] ? "inline-block" : "none";
+      }
+    });
+
   } else {
     googleLoginBtn.style.display = 'block';
     userProfile.style.display = 'none';
     appContainer.style.display = 'none';
+    calendarWrapper.style.display = 'none'; // 달력 숨기기
 
     // 데이터 초기화 (로그아웃시 UI 초기화)
     todoList.innerHTML = '';
     activityList.innerHTML = '';
     certList.innerHTML = '';
+    calendarTable.innerHTML = '';
+    // memo UI도 숨기기
+    calendarMemoBox.style.display = 'none';
+
+    // 기존 달력 onSnapshot 구독 해제
+    if (unsubscribeCalendar) {
+      unsubscribeCalendar();
+      unsubscribeCalendar = null;
+    }
   }
 });
-
-
 
     onSnapshot(todosCol, snap => { todoList.innerHTML = ''; snap.forEach(d => addItem(d.id, d.data().text, todoList, 'todos')); });
     onSnapshot(activitiesCol, snap => { activityList.innerHTML = ''; snap.forEach(d => addItem(d.id, d.data().text, activityList, 'activities')); });
@@ -480,10 +507,12 @@ const memoInput = document.getElementById('memo-input');
 const saveMemoBtn = document.getElementById('save-memo');
 const deleteMemoBtn = document.getElementById('delete-memo');
 const savedMemoDiv = document.getElementById('saved-memo');
+const calendarWrapper = document.getElementById('calendar-wrapper');
 
 const calendarCol = collection(db, 'calendarMemos');
 let currentYear, currentMonth; // month: 0~11
 let calendarMemoMap = {}; // { '2024-07-07': {text, id} }
+let unsubscribeCalendar = null; // 달력 onSnapshot 해제용
 
 function getDateStr(year, month, day) {
   return `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
